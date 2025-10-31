@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nhận diện chữ số</title>
+    <style>
+       body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f4f4f4;
+}
+
+.container {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    max-width: 400px;
+    width: 100%;
+}
+
+h2 {
+    color: #333;
+}
+
+input[type="file"] {
+    margin: 10px 0;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background: #fff;
+    width: 100%;
+    cursor: pointer;
+}
+
+button {
+    padding: 10px 15px;
+    background: #007bff;
+    border: none;
+    color: white;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    width: 100%;
+}
+
+button:hover {
+    background: #0056b3;
+}
+
+p {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    margin-top: 15px;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    margin-top: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+    </style>
+</head>
+<body>
+    <h2>Nhận diện chữ số viết tay</h2>
+    <input type="file" id="fileInput">
+    <button onclick="uploadImage()">Tải lên và dự đoán</button>
+    <p id="result"></p>
+    <img id="preview" src="#" alt="Ảnh đã chọn" style="display: none;">
+    
+    <script>
+        function uploadImage() {
+            let fileInput = document.getElementById("fileInput");
+            let file = fileInput.files[0];
+
+            if (!file) {
+                alert("Vui lòng chọn một hình ảnh!");
+                return;
+            }
+
+            let formData = new FormData();
+            formData.append("file", file);
+
+            let reader = new FileReader();
+            reader.onload = function (e) {
+                let preview = document.getElementById("preview");
+                preview.src = e.target.result;
+                preview.style.display = "block";
+            };
+            reader.readAsDataURL(file);
+
+            fetch("/predict", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("result").innerText = "Số được nhận diện: " + data.digit;
+            })
+            .catch(error => console.error("Lỗi:", error));
+        }
+    </script>
+</body>
+</html>
